@@ -109,3 +109,33 @@ A well written README file can enhance your project and portfolio.  Develop your
 
 ## My Implementation
 
+###The Model
+It was a kinematic model, regardless of inertia, tire forces and so on. 
+
+```
+      // x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
+      // y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
+      // psi_[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
+      // v_[t+1] = v[t] + a[t] * dt
+      // cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
+      // epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
+```
+
+##Timestep Length and Elapsed Duration (N & dt)
+
+T = N * dt. T determined the prediction horizon. If N was too large, the simulation would run very slow. After try with different parameters, I finally set them to N=10, dt=0.1 .
+
+
+##Polynomial Fitting and MPC Preprocessing
+
+First, transform waypoints to vehicle's perspective. 
+Second, use 3rd polynomial to fit the transformed waypoints. 	
+Third, calculate cte and epsi, feed them to `mpc.Solve`
+
+##Model Predictive Control with Latency
+
+The model set the latency time to 100ms (line 183).
+
+##Final result
+
+[video](https://youtu.be/LxfDN_z9sOg)
