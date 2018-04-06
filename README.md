@@ -134,8 +134,8 @@ Third, calculate cte and epsi, feed them to `mpc.Solve`
 
 ##Model Predictive Control with Latency
 
-The model set the latency time to 100ms (line 183).
+I followed my reviewer's advice and calculated the state of the vehicle 100ms in the future before passing it to the solver (line 129-144). After add latency, the car oscillated more often, especially at turning points. So I retuned the parameter to pass this requirement.
 
 ##Final result
 
-[video](https://youtu.be/LxfDN_z9sOg)
+[video](https://youtu.be/0WIrTKja7j8)

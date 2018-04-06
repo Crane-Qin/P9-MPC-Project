@@ -91,7 +91,9 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
-
+          
+          double delta= j[1]["steering_angle"];
+          double a = j[1]["throttle"];
           /*
           * TODO: Calculate steering angle and throttle using MPC.
           *
@@ -113,19 +115,33 @@ int main() {
           // fit a 3rd-order polynomial
           auto coeffs = polyfit(waypoints_x, waypoints_y, 3);
           
-          
+          // Initial state
+          double x0=0;
+          double y0=0;
+          double psi0=0;
           // The cross track error is calculated by evaluating at polynomial at x, f(x) and subtracting y. Now in vehicle's perspective x= 0, y = 0, psi =0 .
-          double cte = polyeval(coeffs, 0) ;
+          double cte0 = polyeval(coeffs, 0) ;
           // TODO: calculate the orientation error
           // Due to the sign starting at 0, the orientation error is -f'(x).
           // derivative of coeffs[0] + coeffs[1] * x -> coeffs[1]
-          double epsi =  - atan(coeffs[1]);
+          double epsi0 =  - atan(coeffs[1]);
+          
+          //delay time in seconds
+          double delaytime=0.1;
+          //account for latency
+          double x_late=x0+v * cos(psi0) * delaytime;
+          double y_late=y0+v * sin(psi0) * delaytime;
+          double psi_late=psi0 -v*delta*delaytime / 2.67;
+          double v_late=v+ a * delaytime;
+          double cte_late =cte0 + v * sin(epsi0) * delaytime ;
+          double epsi_late = epsi0 - v * atan(coeffs[1]) * delaytime /2.67;
           
           //double steer_value = j[1]["steering_angle"];
           //double throttle_value = j[1]["throttle"];
           
           Eigen::VectorXd state(6);
-          state << 0, 0, 0, v, cte, epsi;
+          //state << 0, 0, 0, v, cte, epsi;
+          state << x_late, y_late, psi_late, v_late, cte_late, epsi_late;
           
           auto vars = mpc.Solve(state, coeffs);
           
